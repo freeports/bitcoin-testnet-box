@@ -5,7 +5,7 @@ B1_FLAGS=
 B2_FLAGS=
 B1=-datadir=1 $(B1_FLAGS)
 B2=-datadir=2 $(B2_FLAGS)
-BLOCKS=101
+BLOCKS=1
 ADDRESS=
 AMOUNT=
 ACCOUNT=
@@ -14,14 +14,12 @@ start:
 	$(BITCOIND) $(B1) -daemon -fallbackfee=0.1
 	$(BITCOIND) $(B2) -daemon -fallbackfee=0.1
 
-start-gui1:
+start-gui:
 	$(BITCOINGUI) $(B1) &
-
-start-gui2:
 	$(BITCOINGUI) $(B2) &
 
 generate:
-	$(BITCOINCLI) $(B1) generatetoaddress $(BLOCKS) $(ADDRESS)
+	$(BITCOINCLI) $(B1) generatetoaddress $(BLOCKS) "$(shell $(BITCOINCLI) $(B1) getnewaddress)"
 
 getinfo:
 	$(BITCOINCLI) $(B1) -getinfo
@@ -56,5 +54,5 @@ stop:
 	$(BITCOINCLI) $(B2) stop
 
 clean:
-	rm -rvf  1/regtest/
-	rm -rvd  2/regtest/
+	find 1/regtest -mindepth 1 -not -name 'server.*' -delete
+	find 2/regtest -mindepth 1 -not -name 'server.*' -delete
