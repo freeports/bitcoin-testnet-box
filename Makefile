@@ -5,21 +5,23 @@ B1_FLAGS=
 B2_FLAGS=
 B1=-datadir=1 $(B1_FLAGS)
 B2=-datadir=2 $(B2_FLAGS)
-BLOCKS=1
+BLOCKS=101
 ADDRESS=
 AMOUNT=
 ACCOUNT=
 
 start:
-	$(BITCOIND) $(B1) -daemon
-	$(BITCOIND) $(B2) -daemon
+	$(BITCOIND) $(B1) -daemon -fallbackfee=0.1
+	$(BITCOIND) $(B2) -daemon -fallbackfee=0.1
 
-start-gui:
+start-gui1:
 	$(BITCOINGUI) $(B1) &
+
+start-gui2:
 	$(BITCOINGUI) $(B2) &
 
 generate:
-	$(BITCOINCLI) $(B1) generate $(BLOCKS)
+	$(BITCOINCLI) $(B1) generatetoaddress $(BLOCKS) $(ADDRESS)
 
 getinfo:
 	$(BITCOINCLI) $(B1) -getinfo
@@ -37,10 +39,22 @@ address1:
 address2:
 	$(BITCOINCLI) $(B2) getnewaddress $(ACCOUNT)
 
+total-balance1:
+	$(BITCOINCLI) $(B1) getbalance
+
+total-balance2:
+	$(BITCOINCLI) $(B2) getbalance
+
+balance1:
+	$(BITCOINCLI) $(B1) getreceivedbyaddress ${ADDRESS}
+
+balance2:
+	$(BITCOINCLI) $(B2) getreceivedbyaddress ${ADDRESS}
+
 stop:
 	$(BITCOINCLI) $(B1) stop
 	$(BITCOINCLI) $(B2) stop
 
 clean:
-	find 1/regtest/* -not -name 'server.*' -delete
-	find 2/regtest/* -not -name 'server.*' -delete
+	rm -rvf  1/regtest/
+	rm -rvd  2/regtest/
