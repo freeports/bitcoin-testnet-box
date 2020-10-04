@@ -11,8 +11,8 @@ AMOUNT=
 ACCOUNT=
 
 start:
-	$(BITCOIND) $(B1) -daemon -fallbackfee=0.1
-	$(BITCOIND) $(B2) -daemon -fallbackfee=0.1
+	$(BITCOIND) $(B1) -addresstype=p2sh-segwit -daemon -fallbackfee=0.1
+	$(BITCOIND) $(B2) -addresstype=p2sh-segwit -daemon -fallbackfee=0.1
 
 start-gui:
 	$(BITCOINGUI) $(B1) &
@@ -48,6 +48,9 @@ balance1:
 
 balance2:
 	$(BITCOINCLI) $(B2) getreceivedbyaddress ${ADDRESS}
+
+import1:
+	$(BITCOINCLI) $(B1) importaddress ${ADDRESS}
 
 stop:
 	$(BITCOINCLI) $(B1) stop
