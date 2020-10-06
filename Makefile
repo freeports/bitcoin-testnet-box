@@ -5,14 +5,14 @@ B1_FLAGS=
 B2_FLAGS=
 B1=-datadir=1 $(B1_FLAGS)
 B2=-datadir=2 $(B2_FLAGS)
-BLOCKS=1
+BLOCKS=101
 ADDRESS=
 AMOUNT=
 ACCOUNT=
 
 start:
-	$(BITCOIND) $(B1) -addresstype=p2sh-segwit -daemon -fallbackfee=0.1
-	$(BITCOIND) $(B2) -addresstype=p2sh-segwit -daemon -fallbackfee=0.1
+	$(BITCOIND) $(B1) -addresstype=legacy -daemon -fallbackfee=0.1
+	$(BITCOIND) $(B2) -addresstype=legacy -daemon -fallbackfee=0.1
 
 start-gui:
 	$(BITCOINGUI) $(B1) &
@@ -53,9 +53,10 @@ import1:
 	$(BITCOINCLI) $(B1) importaddress ${ADDRESS}
 
 stop:
-	$(BITCOINCLI) $(B1) stop
+	$(BITCOINCLI) $(B1) stop || :
 	$(BITCOINCLI) $(B2) stop
 
 clean:
+	make stop
 	find 1/regtest -mindepth 1 -not -name 'server.*' -delete
 	find 2/regtest -mindepth 1 -not -name 'server.*' -delete
