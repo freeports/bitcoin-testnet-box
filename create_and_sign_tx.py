@@ -14,6 +14,10 @@ RPC_PORT = '19001'
 def test():
     """Try to send and retrieve some bitcoin."""
 
+    input("""Please run the following:
+          make clean
+          make start 
+          hit enter""")
     # bitcoin keys.
     mr_burns_p_k = base64.b64decode('VOQ42RAILPifvd8C4nqyhPT6WmUK02vTTmrAIrRw/OY=')
     mr_burns_address = 'n2QJopbDeRnwcAGAp2d4uYnNZfzksuoweh'
@@ -26,9 +30,6 @@ def test():
 
     cumberland_address = input(f"""
 Please run the following:
-make stop
-make clean
-make start
 make generate # Generate some bitcoin
 bitcoin-cli -datadir=1 sendtoaddress '{mr_burns_address}' 1 # send one bitcoin to Mr. Burns
 make generate # so the transfer gets mined
@@ -38,14 +39,25 @@ Then paste the result of the last command and hit enter: """)
 
     unspents = rpchost.get_unspent(mr_burns_address)
 
+    print("before tx:")
+    print(f"mr_burns balance: {rpchost.get_balance(mr_burns_address)}")
+    print(f"cumberland balance: {rpchost.get_balance(cumberland_address)}")
+
     amount = 1*10**7
     outputs = [(cumberland_address, amount, 'satoshi')]
     # (cumberland_address, amount, 'satoshi'), (mr_burns_address, unspents[0].amount - amount - 1**4, 'satoshi')]
 
-    unsigned = mr_burns_private_key.prepare_transaction(
+    unsigned = wallet.PrivateKeyTestnet.prepare_transaction(
         mr_burns_address, outputs, True, None, False, None, True, None, unspents)
     signed = mr_burns_private_key.sign_transaction(unsigned)
     rpchost.broadcast_tx_testnet(signed)
+
+    input("""Please run the following for mining the block:
+          make generate
+          then press enter""")
+    print("after tx:")
+    print(f"mr_burns balance: {rpchost.get_balance(mr_burns_address)}")
+    print(f"cumberland balance: {rpchost.get_balance(cumberland_address)}")
 
 
 test()
